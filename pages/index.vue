@@ -129,7 +129,7 @@ export default {
 
                     })
                     .then(function () {
-                        // always executed
+                        //---- always executed
                     });
             }
         },
