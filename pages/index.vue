@@ -150,7 +150,7 @@ export default {
                             that.timerCount = 20;
 
                         } else if (response.data.errorCode == "500.001.1001") {
-                            that.snackbar = true;
+                            that.snackbar = true;gi
                             that.snackbarText = response.data.errorMessage;
                             that.timerCount = 20;
 
