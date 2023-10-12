@@ -54,7 +54,7 @@ export default {
             name: '',
             nameRules: [
                 v => !!v || 'Name is required',
-                v => (v && v.length <= 10) || 'Name must be less than 10 characters',
+                v => (v && v.length <= 20) || 'Name must be less than 10 characters',
             ],
             email: '',
             emailRules: [
@@ -145,21 +145,28 @@ export default {
                     console.log(response);
                     if (response.status == 200) {
                         if (response.data.errorCode == "400.002.02") {
-                            that.snackbar = true;
-                            that.snackbarText = response.data.errorMessage;
+                            that.snackbar2 = true;
+                            that.snackbarText2 = response.data.errorMessage;
                             that.timerCount = 20;
 
                         } else if (response.data.errorCode == "500.001.1001") {
-                            that.snackbar = true;gi
-                            that.snackbarText = response.data.errorMessage;
+                            that.snackbar2 = true;
+                            that.snackbarText2 = response.data.errorMessage;
                             that.timerCount = 20;
 
                         } else {
-                            if (response.data.ResultCode == "0") {}
-                            that.snackbar2 = true;
+                            if (response.data.ResultCode == "0") {
+                            that.snackbar = true;
                             that.snackbarText = response.data.ResultDesc;
                             that.timerEnabled = false;
                             that.timerCount = 20;
+                            }else {
+                            that.snackbar2 = true;
+                            that.snackbarText2 = response.data.ResultDesc;
+                            that.timerEnabled = false;
+                            that.timerCount = 20;
+                            }
+
 
                         }
                     } else if (response.status == 400) {
