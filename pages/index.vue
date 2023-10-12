@@ -9,6 +9,13 @@
             <v-btn color="success" class="mr-4" @click="MpesaPaymentStk">
                 StkPush
             </v-btn>
+            <div class="container">
+                <v-progress-linear color="green accent-4" v-show="show6" indeterminate rounded height="6"></v-progress-linear>
+            </div>
+            <div class="container">
+                <div class="text--green" v-show="snackbar" style="color:green">{{successResponse}}</div>
+                <div class="text--green" v-show="snackbar2" style="color:red">{{errorResponse}}</div>
+            </div>
 
         </v-form>
 
@@ -24,12 +31,12 @@
   >
     {{ snackbarText }}
   </v-snackbar> -->
-  <v-snackbar color="success" :timeout="2000" v-model="snackbar" outlined bottom>
-    {{ snackbarText }}
-  </v-snackbar>
-  <v-snackbar color="error" :timeout="3000" v-model="snackbar2" outlined bottom>
-    {{ snackbarText2 }}
-  </v-snackbar>
+    <v-snackbar color="success" :timeout="2000" v-model="snackbar" outlined bottom>
+        {{ snackbarText }}
+    </v-snackbar>
+    <v-snackbar color="error" :timeout="3000" v-model="snackbar2" outlined bottom>
+        {{ snackbarText2 }}
+    </v-snackbar>
 </v-row>
 </template>
 
@@ -40,6 +47,8 @@ export default {
     name: 'IndexPage',
     data() {
         return {
+            errorResponse: "",
+            successResponse: "",
             Amount: "",
             Phone: null,
             UserName: "",
@@ -48,7 +57,7 @@ export default {
             snackbarText: "",
             snackbarText2: "",
             timerEnabled: false,
-            show6 :false,
+            show6: false,
             timerCount: 20,
             valid: true,
             name: '',
@@ -69,7 +78,7 @@ export default {
                 'Item 4',
             ],
             checkbox: false,
-            CheckoutRequestID:"",
+            CheckoutRequestID: "",
         }
     },
     methods: {
@@ -105,20 +114,25 @@ export default {
                             if (response.data.errorCode == "400.002.02") {
                                 that.snackbar2 = true;
                                 that.snackbarText2 = response.data.errorMessage;
+                                that.show6 = false;
 
                             } else if (response.data.errorCode == "500.001.1001") {
                                 that.snackbar2 = true;
                                 that.snackbarText2 = response.data.errorMessage;
+                                that.show6 = false;
                             } else {
                                 that.timerEnabled = true;
                                 that.snackbar = true;
                                 that.snackbarText = response.data.CustomerMessage;
+                                that.successResponse = response.data.CustomerMessage;
                                 that.CheckoutRequestID = response.data.CheckoutRequestID;
                                 console.log(that.CheckoutRequestID);
                             }
                         } else if (response.status == 400) {
                             that.snackbar2 = true;
                             that.snackbarText2 = response.data;
+                            that.errorMessage = response.data;
+                            that.show6 = false;
 
                         }
                     })
@@ -142,68 +156,76 @@ export default {
                     checkoutRequestId: that.CheckoutRequestID,
                 })
                 .then(function (response) {
-                    console.log(response);
+                    console.log("StkPush Query",response.data);
                     if (response.status == 200) {
                         if (response.data.errorCode == "400.002.02") {
                             that.snackbar2 = true;
                             that.snackbarText2 = response.data.errorMessage;
+                            that.errorResponse = response.data.errorMessage;
+                            that.errorResponse = response.data.errorMessage;
                             that.timerCount = 20;
-
+                            that.show6 = false;
                         } else if (response.data.errorCode == "500.001.1001") {
                             that.snackbar2 = true;
                             that.snackbarText2 = response.data.errorMessage;
+                            that.errorResponse = response.data.errorMessage;
                             that.timerCount = 20;
-
+                            that.show6 = false;
                         } else {
                             if (response.data.ResultCode == "0") {
-                            that.snackbar = true;
-                            that.snackbarText = response.data.ResultDesc;
-                            that.timerEnabled = false;
-                            that.timerCount = 20;
-                            }else {
-                            that.snackbar2 = true;
-                            that.snackbarText2 = response.data.ResultDesc;
-                            that.timerEnabled = false;
-                            that.timerCount = 20;
+                                that.snackbar = true;
+                                that.snackbarText = response.data.ResultDesc;
+                                that.successResponse = response.data.ResultDesc;
+                                that.timerEnabled = false;
+                                that.timerCount = 20;
+                                that.show6 = false;
+                            } else {
+                                that.snackbar2 = true;
+                                that.snackbarText2 = response.data.ResultDesc;
+                                that.errorResponse = response.data.ResultDesc;
+                                that.timerEnabled = false;
+                                that.timerCount = 20;
+                                that.show6 = false;
                             }
-
 
                         }
                     } else if (response.status == 400) {
-                        that.snackbar = true;
-                        that.snackbarText = response.data;
+                        that.snackbar2 = true;
+                        that.snackbarText2 = response.data;
                         that.timerCount = 20;
+                        that.show6 = false;
 
                     }
                 })
                 .catch(function (error) {
                     console.log(error);
+                    that.show6 = false;
                 });
         },
     },
     watch: {
-    timerEnabled(value) {
-      if (value) {
-        setTimeout(() => {
-          this.timerCount--;
-        }, 1000);
-      }
-    },
-    timerCount: {
-      handler(value) {
-        if (value > 0 && this.timerEnabled) {
-          setTimeout(() => {
-            this.timerCount--;
-          }, 1000);
-        } else if (value == 0) {
-          this.show6 = false;
-          this.Query = true;
-          console.log("Done", this.Query);
-          this.StkQuery();
-        }
-      },
-      immediate: true, // This ensures the watcher is triggered upon creation
-    },
-  }
+        timerEnabled(value) {
+            if (value) {
+                setTimeout(() => {
+                    this.timerCount--;
+                }, 1000);
+            }
+        },
+        timerCount: {
+            handler(value) {
+                if (value > 0 && this.timerEnabled) {
+                    setTimeout(() => {
+                        this.timerCount--;
+                    }, 1000);
+                } else if (value == 0) {
+                    this.show6 = false;
+                    this.Query = true;
+                    console.log("Done", this.Query);
+                    this.StkQuery();
+                }
+            },
+            immediate: true, // This ensures the watcher is triggered upon creation
+        },
+    }
 }
 </script>
