@@ -31,10 +31,10 @@
   >
     {{ snackbarText }}
   </v-snackbar> -->
-    <v-snackbar color="success" :timeout="2000" v-model="snackbar" outlined bottom>
+    <v-snackbar color="success" :timeout="2000" v-model="snackbar" outlined center>
         {{ snackbarText }}
     </v-snackbar>
-    <v-snackbar color="error" :timeout="3000" v-model="snackbar2" outlined bottom>
+    <v-snackbar color="error" :timeout="3000" v-model="snackbar2" outlined center>
         {{ snackbarText2 }}
     </v-snackbar>
 </v-row>
