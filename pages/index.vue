@@ -128,7 +128,7 @@ export default {
     name: 'IndexPage',
     data() {
         return {
-          logo:require('@/assets/logo.png'),
+          logo:require('@/assets/logo.PNG'),
           bg:require('@/assets/bg.png'),
             errorResponse: "",
             successResponse: "",
