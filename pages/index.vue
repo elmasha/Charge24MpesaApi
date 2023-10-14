@@ -1,36 +1,115 @@
 <template>
-<v-row justify="center" align="center">
+<v-container>
+  <v-row justify="center" align="center">
+
     <v-col cols="12" sm="12" md="12">
-        <v-form ref="form" v-model="valid" lazy-validation>
-            <v-text-field v-model="Amount" :counter="10" :rules="nameRules" label="Enter Amount" required></v-text-field>
 
-            <v-text-field v-model="Phone" :rules="nameRules" label="Phone number" placeholder="254 34-3400-7734" required></v-text-field>
+    <v-card
+    color="white"
+    flat
+    height="200px"
+    tile
+  >
+    <v-toolbar
+    elevation="0"
+      extended
+      extension-height="90"
+    >
 
-            <v-btn color="success" class="mr-4" @click="MpesaPaymentStk">
-                StkPush
-            </v-btn>
+      <nuxt-link class="nuxt-link" to="/"
+        ><v-img style="margin-top:10px" :src="logo" contain height="100" max-width="150"> </v-img
+      ></nuxt-link>
+
+      <v-spacer></v-spacer>
+
+      <div style="margin-top:40px">
+        <v-btn text small>
+          <v-icon>mdi-lock</v-icon><span>Secure form</span>
+        </v-btn>
+        <br>
+        <p class="text-center"  style="font-size:0.7rem; color:rgb(122, 122, 120)">Your data is protected,<br/>everything will be private</p>
+      </div>
+
+
+
+
+    </v-toolbar>
+
+
+    <v-container>
+      <v-row justify="center" align="center">
+
+        <v-col cols="12" sm="12" md="12">
+          <div id="charter">
             <div class="container">
-                <v-progress-linear color="green accent-4" v-show="show6" indeterminate rounded height="6"></v-progress-linear>
+              <h2>Payment details</h2>
             </div>
             <div class="container">
-                <div class="text--green" v-show="snackbar" style="color:green">{{successResponse}}</div>
-                <div class="text--green" v-show="snackbar2" style="color:red">{{errorResponse}}</div>
-            </div>
 
-        </v-form>
+
+              <p style="font-size:medium">
+                In order to use our power bank, a refundable deposit will be required. This deposit is necessary to ensure the safe and efficient operation of our power bank rental program. <br>
+                Here are some key details regarding the deposit:
+
+                <br>
+                <strong >Deposit Amount: Ksh 1500</strong><br>
+               <!-- Your deposit will be refundable upon the return of the power bank in good condition and within the agreed-upon timeframe. -->
+              </p>
+            </div>
+          </div>
+        </v-col>
+        <v-col cols="12" sm="12" md="12">
+<br>
+          <v-container>
+
+            <div class="d-flex">
+              <v-spacer></v-spacer>
+              <div class="col-md-6">
+                <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-text-field disabled v-model="Amount"  :rules="nameRules" label="Deposit Amount" required></v-text-field>
+
+                  <v-text-field v-model="Phone" outlined rounded clearable type="phone" :rules="nameRules" label="Provide Mpesa number" placeholder="2547 34-3400-7734" required></v-text-field>
+
+                  <v-btn color="success" block class="mr-4 text-caption" @click="MpesaPaymentStk">
+                     Request StkPush
+                  </v-btn>
+                  <div class="container">
+                      <v-progress-linear color="green accent-4" v-show="show6" indeterminate rounded height="6"></v-progress-linear>
+                  </div>
+                  <div class="container">
+                      <div class="text--green" v-show="snackbar" style="color:green">{{successResponse}}</div>
+                      <div class="text--green" v-show="snackbar2" style="color:red">{{errorResponse}}</div>
+                  </div>
+
+              </v-form>
+              </div>
+
+            <v-spacer></v-spacer>
+            </div>
+          </v-container>
+
+        </v-col>
+      </v-row>
+
+
+    </v-container>
+
+
+
+
+
+  </v-card>
+
+
+
+
+
 
     </v-col>
 
-    <!-- <v-snackbar
-    color="red accent-8"
-    :timeout="3000"
-    v-model="snackbar"
-    centered
-    outlined
-    bottom
-  >
-    {{ snackbarText }}
-  </v-snackbar> -->
+    <v-snackbar color="primary accent-8" :timeout="6000" v-model="snackbar_s" centered bottom>
+        {{ snackbarText_s }}
+    </v-snackbar>
     <v-snackbar color="success" :timeout="2000" v-model="snackbar" outlined center>
         {{ snackbarText }}
     </v-snackbar>
@@ -38,6 +117,8 @@
         {{ snackbarText2 }}
     </v-snackbar>
 </v-row>
+</v-container>
+
 </template>
 
 <script>
@@ -47,15 +128,20 @@ export default {
     name: 'IndexPage',
     data() {
         return {
+          logo:require('@/assets/logo.png'),
+          bg:require('@/assets/bg.png'),
             errorResponse: "",
             successResponse: "",
-            Amount: "",
+            Amount: "1500",
             Phone: null,
             UserName: "",
+            snackbar_s: false,
+            snackbarText_s: "",
             snackbar: false,
             snackbar2: false,
             snackbarText: "",
             snackbarText2: "",
+            status: false,
             timerEnabled: false,
             show6: false,
             timerCount: 20,
@@ -94,7 +180,7 @@ export default {
 
         MpesaPaymentStk() {
             let that = this;
-            that.show6 = true;
+
             if (this.Phone == null) {
                 that.snackbarText = "Provide phone number..";
                 that.snackbar = true;
@@ -103,6 +189,7 @@ export default {
                 that.snackbar = true;
 
             } else {
+              that.show6 = true;
                 axios
                     .post("https://chargenowmpesaapi-077f3b4b044f.herokuapp.com/stk", {
                         Phonenumber: this.Phone,
@@ -150,13 +237,16 @@ export default {
 
         ////Stk Query////
         StkQuery() {
+
             let that = this;
+            that.snackbar_s = true;
+            that.snackbarText_s = "Checking payment status...";
             axios
                 .post("https://chargenowmpesaapi-077f3b4b044f.herokuapp.com/stk/query", {
                     checkoutRequestId: that.CheckoutRequestID,
                 })
                 .then(function (response) {
-                    console.log("StkPush Query",response.data);
+                    console.log("StkPush Query", response.data);
                     if (response.status == 200) {
                         if (response.data.errorCode == "400.002.02") {
                             that.snackbar2 = true;
@@ -229,3 +319,17 @@ export default {
     }
 }
 </script>
+
+<style>
+#charter {
+  transition: 0.5s ease;
+  background-image: url("@/assets/bg.png");
+  background-attachment: fixed;
+  background-position: center;
+  background-size: contain;
+
+  width: 100%;
+  height: 260px;
+}
+
+</style>
