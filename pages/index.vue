@@ -185,7 +185,7 @@ export default {
                 that.snackbarText = "Provide phone number..";
                 that.snackbar = true;
             } else if (this.Amount == "") {
-                that.snackbarText = "Provide amount..";
+                that.snackbarText = "Provide amount.";
                 that.snackbar = true;
 
             } else {
