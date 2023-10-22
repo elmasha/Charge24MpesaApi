@@ -70,7 +70,8 @@
 
                   <v-text-field v-model="Phone" outlined rounded clearable type="phone" :rules="nameRules" label="Provide Mpesa number" placeholder="2547 34-3400-7734" required></v-text-field>
 
-                  <v-btn color="success" block class="mr-4 text-caption" @click="MpesaPaymentStk">
+                  <!-- @click="MpesaPaymentStk -->
+                  <v-btn color="success" block class="mr-4 text-caption" to="/timer">
                      Request StkPush
                   </v-btn>
                   <div class="container">
