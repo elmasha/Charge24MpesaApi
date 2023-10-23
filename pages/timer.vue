@@ -104,9 +104,10 @@
                                 Request Cash Refund
                             </v-btn>
 
-                            <div v-show="cash_refund" class="container">
+                            <br>
+                            <div v-show="cash_refund" class="">
 
-                              <div class="container">
+                              <div class="">
                                 <p class="text-start"><v-icon color="orange">mdi-alert-octagram</v-icon> Please note that your money will be reserved once power bank is returned. </p>
 
                               </div>
@@ -360,7 +361,8 @@ export default {
             } else {
                 console.log("User no logged in");
 
-                this.loginAnonymously1();
+                window.location.reload(true);
+                //this.loginAnonymously1();
             }
         },
     },

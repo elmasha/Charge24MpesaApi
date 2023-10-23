@@ -1,136 +1,120 @@
 <template>
 <v-container>
-  <v-row justify="center" align="center">
-
-    <v-col cols="12" sm="12" md="12">
-
-    <v-card
-    color="white"
-    flat
-    height="200px"
-    tile
-  >
-    <v-toolbar
-    elevation="0"
-      extended
-      extension-height="90"
-    >
-
-      <nuxt-link class="nuxt-link" to="/"
-        ><v-img style="margin-top:10px" :src="logo" contain height="100" max-width="150"> </v-img
-      ></nuxt-link>
-
-      <v-spacer></v-spacer>
-
-      <div style="margin-top:40px">
-        <v-btn text small>
-          <v-icon>mdi-lock</v-icon><span>Secure form</span>
-        </v-btn>
-        <br>
-        <p class="text-center"  style="font-size:0.7rem; color:rgb(122, 122, 120)">Your data is protected,<br/>everything will be private</p>
-      </div>
-
-
-
-
-    </v-toolbar>
-
-
-    <v-container>
-      <v-row justify="center" align="center">
+    <v-row justify="center" align="center">
 
         <v-col cols="12" sm="12" md="12">
-          <div id="charter">
-            <div class="container">
-              <h2>Payment details</h2>
-            </div>
-            <div class="container">
 
+            <v-card color="white" flat height="200px" tile>
+                <v-toolbar elevation="0" extended extension-height="90">
 
-              <p style="font-size:medium">
-                In order to use our power bank, a refundable deposit will be required. This deposit is necessary to ensure the safe and efficient operation of our power bank rental program. <br>
-                Here are some key details regarding the deposit:
+                    <nuxt-link class="nuxt-link" to="/">
+                        <v-img style="margin-top:10px" :src="logo" contain height="100" max-width="150"> </v-img>
+                    </nuxt-link>
 
-                <br>
-                <strong >Deposit Amount: Ksh 1500</strong><br>
-               <!-- Your deposit will be refundable upon the return of the power bank in good condition and within the agreed-upon timeframe. -->
-              </p>
-            </div>
-          </div>
+                    <v-spacer></v-spacer>
+
+                    <div style="margin-top:40px">
+                        <v-btn text small>
+                            <v-icon>mdi-lock</v-icon><span>Secure form</span>
+                        </v-btn>
+                        <br>
+                        <p class="text-center" style="font-size:0.7rem; color:rgb(122, 122, 120)">Your data is protected,<br />everything will be private</p>
+                    </div>
+
+                </v-toolbar>
+
+                <v-container>
+                    <v-row justify="center" align="center">
+
+                        <v-col cols="12" sm="12" md="12">
+                            <div id="charter">
+                                <div class="container">
+                                    <h2>Payment details</h2>
+                                </div>
+                                <div class="container">
+
+                                    <p style="font-size:medium">
+                                        In order to use our power bank, a refundable deposit will be required. This deposit is necessary to ensure the safe and efficient operation of our power bank rental program. <br>
+                                        Here are some key details regarding the deposit:
+
+                                        <br>
+                                        <strong>Deposit Amount: Ksh 1500</strong><br>
+                                        <!-- Your deposit will be refundable upon the return of the power bank in good condition and within the agreed-upon timeframe. -->
+                                    </p>
+                                </div>
+                            </div>
+                        </v-col>
+                        <v-col cols="12" sm="12" md="12">
+                            <br>
+                            <v-container>
+
+                                <div class="d-flex">
+                                    <v-spacer></v-spacer>
+                                    <div class="col-md-6">
+                                        <v-form ref="form" v-model="valid" lazy-validation>
+                                            <v-text-field disabled v-model="Amount" :rules="nameRules" label="Deposit Amount" required></v-text-field>
+
+                                            <v-text-field v-model="Phone" outlined rounded clearable type="phone" :rules="nameRules" label="Provide Mpesa number" placeholder="2547 34-3400-7734" required></v-text-field>
+
+                                            <!--  -->
+                                            <v-btn color="success" block class="mr-4 text-caption" @click="MpesaPaymentStk">
+                                                Request StkPush
+                                            </v-btn>
+                                            <div class="container">
+                                                <v-progress-linear color="green accent-4" v-show="show6" indeterminate rounded height="6"></v-progress-linear>
+                                            </div>
+                                            <div class="container">
+                                                <div class="text--green" v-show="snackbar" style="color:green">{{successResponse}}</div>
+                                                <div class="text--green" v-show="snackbar2" style="color:red">{{errorResponse}}</div>
+                                            </div>
+
+                                        </v-form>
+                                    </div>
+
+                                    <v-spacer></v-spacer>
+                                </div>
+                            </v-container>
+
+                        </v-col>
+                    </v-row>
+
+                </v-container>
+
+            </v-card>
+
         </v-col>
-        <v-col cols="12" sm="12" md="12">
-<br>
-          <v-container>
 
-            <div class="d-flex">
-              <v-spacer></v-spacer>
-              <div class="col-md-6">
-                <v-form ref="form" v-model="valid" lazy-validation>
-                  <v-text-field disabled v-model="Amount"  :rules="nameRules" label="Deposit Amount" required></v-text-field>
-
-                  <v-text-field v-model="Phone" outlined rounded clearable type="phone" :rules="nameRules" label="Provide Mpesa number" placeholder="2547 34-3400-7734" required></v-text-field>
-
-                  <!-- @click="MpesaPaymentStk -->
-                  <v-btn color="success" block class="mr-4 text-caption" to="/timer">
-                     Request StkPush
-                  </v-btn>
-                  <div class="container">
-                      <v-progress-linear color="green accent-4" v-show="show6" indeterminate rounded height="6"></v-progress-linear>
-                  </div>
-                  <div class="container">
-                      <div class="text--green" v-show="snackbar" style="color:green">{{successResponse}}</div>
-                      <div class="text--green" v-show="snackbar2" style="color:red">{{errorResponse}}</div>
-                  </div>
-
-              </v-form>
-              </div>
-
-            <v-spacer></v-spacer>
-            </div>
-          </v-container>
-
-        </v-col>
-      </v-row>
-
-
-    </v-container>
-
-
-
-
-
-  </v-card>
-
-
-
-
-
-
-    </v-col>
-
-    <v-snackbar color="primary accent-8" :timeout="6000" v-model="snackbar_s" centered bottom>
-        {{ snackbarText_s }}
-    </v-snackbar>
-    <v-snackbar color="success" :timeout="2000" v-model="snackbar" outlined center>
-        {{ snackbarText }}
-    </v-snackbar>
-    <v-snackbar color="error" :timeout="3000" v-model="snackbar2" outlined center>
-        {{ snackbarText2 }}
-    </v-snackbar>
-</v-row>
+        <v-snackbar color="primary accent-8" :timeout="6000" v-model="snackbar_s" centered bottom>
+            {{ snackbarText_s }}
+        </v-snackbar>
+        <v-snackbar color="success" :timeout="2000" v-model="snackbar" outlined center>
+            {{ snackbarText }}
+        </v-snackbar>
+        <v-snackbar color="error" :timeout="3000" v-model="snackbar2" outlined center>
+            {{ snackbarText2 }}
+        </v-snackbar>
+    </v-row>
 </v-container>
-
 </template>
 
 <script>
 import axios from "axios";
+import {
+    Timestamp
+} from '@firebase/firestore';
+import dayjs from '@nuxtjs/dayjs';
+import moment from 'moment';
+
+import {
+    uuid
+} from "vue-uuid";
 
 export default {
     name: 'IndexPage',
     data() {
         return {
-          logo:require('@/assets/logo.PNG'),
-          bg:require('@/assets/bg.png'),
+            logo: require('@/assets/logo.PNG'),
+            bg: require('@/assets/bg.png'),
             errorResponse: "",
             successResponse: "",
             Amount: "1500",
@@ -190,11 +174,11 @@ export default {
                 that.snackbar = true;
 
             } else {
-              that.show6 = true;
+                that.show6 = true;
                 axios
                     .post("https://chargenowmpesaapi-077f3b4b044f.herokuapp.com/stk", {
                         Phonenumber: this.Phone,
-                        amount: this.Amount,
+                        amount: "1",
                     })
                     .then(function (response) {
                         console.log(response);
@@ -270,6 +254,7 @@ export default {
                                 that.timerEnabled = false;
                                 that.timerCount = 20;
                                 that.show6 = false;
+                                that.loginAnonymously1();
                             } else {
                                 that.snackbar2 = true;
                                 that.snackbarText2 = response.data.ResultDesc;
@@ -292,6 +277,42 @@ export default {
                     console.log(error);
                     that.show6 = false;
                 });
+        },
+        loginAnonymously1() {
+            this.$fire.auth
+                .signInAnonymously()
+                .catch(function (error) {
+                    this.snackbarText = error.message;
+                    this.snackbar = true;
+                    this.showLogin = false;
+                })
+                .then((user) => {
+                    //we are signed in
+
+                    const start_time = this.$dayjs(new Date()).format('YYYY/MM/DD HH:mm:ss');
+                    let ID = uuid.v1();
+                    console.log(uuid.v1());
+                    const db = this.$fire.firestore;
+                    db.collection("Charge24_users")
+                        .doc(user.user.uid)
+                        .set({
+                            user_id: user.user.uid,
+                            start_time: start_time,
+                            ref: ID,
+                            active: true,
+                        })
+                        .then((docRef) => {
+                            console.log("User logged in");
+                            this.$router.push({
+                                    path: "/timer"
+                                });
+                        })
+                        .catch((error) => {
+                            console.error("Error adding document: ", error);
+
+                        });
+                });
+
         },
     },
     watch: {
@@ -323,14 +344,13 @@ export default {
 
 <style>
 #charter {
-  transition: 0.5s ease;
-  background-image: url("@/assets/bg.png");
-  background-attachment: fixed;
-  background-position: center;
-  background-size: contain;
+    transition: 0.5s ease;
+    background-image: url("@/assets/bg.png");
+    background-attachment: fixed;
+    background-position: center;
+    background-size: contain;
 
-  width: 100%;
-  height: 260px;
+    width: 100%;
+    height: 260px;
 }
-
 </style>
