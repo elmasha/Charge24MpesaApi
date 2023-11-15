@@ -216,6 +216,8 @@ export default {
                     })
                     .then(function () {
                         //---- always executed
+                        console.log("Done stk",);
+
                     });
             }
         },
