@@ -116,8 +116,8 @@
 
                                     <div class="text-center">
                                         <div class="col-md-6">
-                                            <v-text-field outlined rounded placeholder="Mpesa Code. eg RFM12HQF" clearable type="text" label="Mpesa Code"></v-text-field>
-                                             <v-btn style="colo:#fff" class="text--white" color="green" @click="refresh,cash_refund = !cash_refund">
+                                            <v-text-field outlined v-model="mpesa_code" rounded placeholder="Mpesa Code. eg RFM12HQF" clearable type="text" label="Mpesa Code"></v-text-field>
+                                             <v-btn style="colo:#fff" class="text--white" color="green" @click="mpesaReversal">
                                                 Reverse Ksh{{(2500 - amount).toFixed(0) }}
                                             </v-btn>
                                         </div>
@@ -191,6 +191,7 @@ export default {
             init_time: null,
             hr_min: null,
             refundable_amount: 0,
+            mpesa_code : null,
         }
     },
     created() {
@@ -212,6 +213,7 @@ export default {
     },
     mounted() {
 
+
         this.checkUserID(),
             this.interval = setInterval(() => {
                 if (this.value === 60) {
@@ -230,6 +232,57 @@ export default {
             }, 1000)
     },
     methods: {
+      mpesaReversal() {
+            let that = this;
+            if (this.mpesa_code == null) {
+                that.snackbarText2 = "Provide mpesa code..";
+                that.snackbar2 = true;
+            }  else {
+                that.show6 = true;
+                axios
+                    .post("https://chargenowmpesaapi-077f3b4b044f.herokuapp.com/reverse", {
+                      mpesaCode: this.mpesa_code,
+                    })
+                    .then(function (response) {
+                        console.log(response);
+                        if (response.status == 200) {
+                            if (response.data.errorCode == "400.002.02") {
+                                that.snackbar2 = true;
+                                that.snackbarText2 = response.data.errorMessage;
+                                that.show6 = false;
+
+                            } else if (response.data.errorCode == "500.001.1001") {
+                                that.snackbar2 = true;
+                                that.snackbarText2 = response.data.errorMessage;
+                                that.show6 = false;
+                            } else {
+                                that.timerEnabled = true;
+                                that.snackbar = true;
+                                that.snackbarText = response.data.CustomerMessage;
+                                that.successResponse = response.data.CustomerMessage;
+                                that.CheckoutRequestID = response.data.CheckoutRequestID;
+                                console.log(that.CheckoutRequestID);
+                            }
+                        } else if (response.status == 400) {
+                            that.snackbar2 = true;
+                            that.snackbarText2 = response.data;
+                            that.errorMessage = response.data;
+                            that.show6 = false;
+
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        that.snackbarText = error;
+                        that.snackbar = true;
+
+                    })
+                    .then(function () {
+                        //---- always executed
+                    });
+            }
+        },
+
         refresh() {
             if (this.$fire.auth.currentUser != null) {
 

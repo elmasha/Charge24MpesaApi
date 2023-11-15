@@ -304,8 +304,8 @@ export default {
                         .then((docRef) => {
                             console.log("User logged in");
                             this.$router.push({
-                                    path: "/timer"
-                                });
+                                path: "/timer"
+                            });
                         })
                         .catch((error) => {
                             console.error("Error adding document: ", error);
@@ -313,6 +313,10 @@ export default {
                         });
                 });
 
+        },
+        logout() {
+            this.$fire.auth.signOut();
+            window.location.reload(true);
         },
     },
     watch: {

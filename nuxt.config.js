@@ -41,7 +41,7 @@ export default {
     families: {
       Lato: true,
     },
-    display: "Jost",
+    display: "Lato",
   },
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
