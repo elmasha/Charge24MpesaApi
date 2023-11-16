@@ -99,10 +99,8 @@
 
 <script>
 import axios from "axios";
-import {
-    Timestamp
-} from '@firebase/firestore';
 import dayjs from '@nuxtjs/dayjs';
+import fire from '@nuxtjs/firebase';
 import moment from 'moment';
 
 import {
@@ -162,7 +160,6 @@ export default {
         resetValidation() {
             this.$refs.form.resetValidation()
         },
-
         MpesaPaymentStk() {
             let that = this;
 
@@ -216,12 +213,11 @@ export default {
                     })
                     .then(function () {
                         //---- always executed
-                        console.log("Done stk",);
+                        console.log("Done stk", );
 
                     });
             }
         },
-
         ////Stk Query////
         StkQuery() {
 
@@ -241,12 +237,14 @@ export default {
                             that.errorResponse = response.data.errorMessage;
                             that.errorResponse = response.data.errorMessage;
                             that.timerCount = 20;
+                            that.timerEnabled = false;
                             that.show6 = false;
                         } else if (response.data.errorCode == "500.001.1001") {
                             that.snackbar2 = true;
                             that.snackbarText2 = response.data.errorMessage;
                             that.errorResponse = response.data.errorMessage;
                             that.timerCount = 20;
+                            that.timerEnabled = false;
                             that.show6 = false;
                         } else {
                             if (response.data.ResultCode == "0") {
@@ -271,6 +269,7 @@ export default {
                         that.snackbar2 = true;
                         that.snackbarText2 = response.data;
                         that.timerCount = 20;
+                        that.timerEnabled = false;
                         that.show6 = false;
 
                     }
@@ -278,6 +277,10 @@ export default {
                 .catch(function (error) {
                     console.log(error);
                     that.show6 = false;
+                    that.snackbar2 = true;
+                    that.snackbarText2 = error;
+                    that.timerCount = 20;
+                    that.timerEnabled = false;
                 });
         },
         loginAnonymously1() {
@@ -290,31 +293,31 @@ export default {
                 })
                 .then((user) => {
                     //we are signed in
-
-                    const start_time = this.$dayjs(new Date()).format('YYYY/MM/DD HH:mm:ss');
-                    let ID = uuid.v1();
-                    console.log(uuid.v1());
-                    const db = this.$fire.firestore;
-                    db.collection("Charge24_users")
-                        .doc(user.user.uid)
-                        .set({
-                            user_id: user.user.uid,
-                            start_time: start_time,
-                            ref: ID,
-                            active: true,
-                        })
-                        .then((docRef) => {
-                            console.log("User logged in");
-                            this.$router.push({
-                                path: "/timer"
-                            });
-                        })
-                        .catch((error) => {
-                            console.error("Error adding document: ", error);
-
-                        });
+                    this.uploadDetails(user.user.uid);
                 });
 
+        },
+        uploadDetails(val) {
+            const db = this.$fire.firestore;
+            const start_timer = this.$dayjs(new Date()).format('YYYY/MM/DD HH:mm:ss');
+            let ID = uuid.v1();
+            console.log(uuid.v1());
+            db.collection("charge24_users").doc(val)
+                .set({
+                    user_id: val,
+                    start_time: start_timer,
+                    ref: ID,
+                    active: true
+                }).then(() => {
+                    console.log("User logged in");
+                    this.$router.push({
+                        path: "/timer"
+                    });
+                })
+                .catch(function(error)  {
+                    console.log("Error adding document: ", error);
+
+                });
         },
         logout() {
             this.$fire.auth.signOut();
@@ -355,7 +358,6 @@ export default {
     background-attachment: fixed;
     background-position: center;
     background-size: contain;
-
     width: 100%;
     height: 260px;
 }

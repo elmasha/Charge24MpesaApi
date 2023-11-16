@@ -50,6 +50,7 @@ export default {
     '@nuxtjs/vuetify',
     "@nuxtjs/google-fonts",
     '@nuxtjs/moment',
+    '@nuxtjs/dayjs',
 
   ],
   moment: {
@@ -59,18 +60,18 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
-    '@nuxtjs/dayjs',
+
     [
       "@nuxtjs/firebase",
       {
         config: {
-          apiKey: "AIzaSyD90O7UdCwrX-KGiBSElhNrJiWeTXtd9b4",
-          authDomain: "charge24-ab72d.firebaseapp.com",
-          projectId: "charge24-ab72d",
-          storageBucket: "charge24-ab72d.appspot.com",
-          messagingSenderId: "124534944554",
-          appId: "1:124534944554:web:7d4bf62a90602e9a9be453",
-          measurementId: "G-VXQH26615L"
+          apiKey: "AIzaSyBg2J3dfWy1Zt6aVPrSZEtb6ghAzeYAPoA",
+          authDomain: "charge-51ab0.firebaseapp.com",
+          projectId: "charge-51ab0",
+          storageBucket: "charge-51ab0.appspot.com",
+          messagingSenderId: "421905719927",
+          appId: "1:421905719927:web:25586c0006f19b97bb5c72",
+          measurementId: "G-4D28CY8G3T"
         },
         services: {
           auth: {
@@ -79,11 +80,14 @@ export default {
               nAuthStateChangedMutation: "ON_AUTH_STATE_CHANGED_MUTATION",
               subscribeManually: false,
             },
-            ssr: false, // default
-          }, // authentication
-          firestore: true, // firestoreDb
+            ssr: false,
+          },
           storage: true,
-          realtimeDb: true// storage./ Just as example. Can be any other service.
+          auth: true,
+          firestore: true,
+          functions: true,
+          storage: true,
+          database: true,
         },
       },
     ],
