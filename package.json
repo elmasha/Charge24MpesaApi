@@ -17,7 +17,7 @@
     "child_process": "^1.0.2",
     "core-js": "^3.25.3",
     "dayjs": "^1.11.10",
-    "firebase": "^9.6.2",
+    "firebase": "^9.17.1",
     "fs": "^0.0.1-security",
     "module": "^1.2.5",
     "nuxt": "^2.15.8",

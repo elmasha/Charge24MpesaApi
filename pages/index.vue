@@ -100,7 +100,6 @@
 <script>
 import axios from "axios";
 import dayjs from '@nuxtjs/dayjs';
-import fire from '@nuxtjs/firebase';
 import moment from 'moment';
 
 import {
@@ -293,7 +292,30 @@ export default {
                 })
                 .then((user) => {
                     //we are signed in
-                    this.uploadDetails(user.user.uid);
+                    const start_time = this.$dayjs(new Date()).format('YYYY/MM/DD HH:mm:ss');
+                    let ID = uuid.v1();
+                    console.log(uuid.v1());
+                    const db = this.$fire.firestore;
+                    db.collection("Charge24_users")
+                        .doc(user.user.uid)
+                        .set({
+                            user_id: user.user.uid,
+                            start_time: start_time,
+                            ref: ID,
+                            active: true,
+                        })
+                        .then((docRef) => {
+                            console.log("User logged in");
+                            this.snackbar = true;
+                            this.snackbarText = "Process Successfully completed";
+                            this.$router.push({
+                        path: "/timer"
+                    });
+                        })
+                        .catch((error) => {
+                            console.log("Error adding document: ", error);
+
+                        });
                 });
 
         },

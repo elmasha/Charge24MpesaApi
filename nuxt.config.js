@@ -3,7 +3,6 @@ import colors from 'vuetify/es5/util/colors'
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
-  mode: "spa",
 
   // Target: https://go.nuxtjs.dev/config-target
 
@@ -83,11 +82,8 @@ export default {
             ssr: false,
           },
           storage: true,
-          auth: true,
           firestore: true,
-          functions: true,
           storage: true,
-          database: true,
         },
       },
     ],

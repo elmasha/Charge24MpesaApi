@@ -394,7 +394,7 @@ export default {
                             console.log("User logged in");
                         })
                         .catch((error) => {
-                            console.error("Error adding document: ", error);
+                            console.log("Error adding document: ", error);
 
                         });
                 });
