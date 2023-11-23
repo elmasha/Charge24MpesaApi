@@ -4,8 +4,8 @@
 
         <v-col cols="12" sm="12" md="12">
 
-            <v-card color="white" flat height="200px" tile>
-                <v-toolbar elevation="0" extended extension-height="90">
+            <v-card color="black" flat height="200px" tile>
+                <v-toolbar color="black" elevation="0" extended extension-height="90">
 
                     <nuxt-link class="nuxt-link" to="/">
                         <v-img style="margin-top:10px" :src="logo" contain height="100" max-width="150"> </v-img>
@@ -381,6 +381,7 @@ export default {
     background-attachment: fixed;
     background-position: center;
     background-size: contain;
+    background-color: black;
     width: 100%;
     height: 260px;
 }

@@ -1,10 +1,10 @@
 <template>
-<div>
+<div style="background-color:black">
     <v-container>
 
         <v-row>
             <v-col cols="12" sm="12" md="12">
-                <v-toolbar elevation="0" extension-height="90">
+                <v-toolbar color="black" elevation="0" extension-height="90">
 
                     <nuxt-link class="nuxt-link" to="/">
                         <v-img style="margin-top:10px" :src="logo" contain height="100" max-width="150"> </v-img>
@@ -77,7 +77,7 @@
             </v-col>
 
             <v-col cols="12" sm="6" md="6">
-                <v-card color="white" flat height="200px"  elevation="0">
+                <v-card color="black" flat height="200px"  elevation="0">
                     <div id="charter" style="padding:3rem">
                         <div>
 
@@ -98,14 +98,14 @@
                             </p>
                         </div>
 
-                        <div>
-                            <v-btn text @click="cash_refund = !cash_refund">
-                                <v-icon>mdi-cash-refund</v-icon>
-                                Request Cash Refund
+                        <div style="background-color:black">
+                            <v-btn v-show="auth_state" text @click="cash_refund = !cash_refund">
+                                <v-icon color="green">mdi-cash-refund</v-icon>
+                                Request Cash Refund  {{(deposit - amount).toFixed(0) }}
                             </v-btn>
 
-                            <br>
-                            <div v-show="cash_refund" class="">
+
+                            <div v-show="cash_refund" class="" >
 
                               <div class="">
                                 <p class="text-start"><v-icon color="orange">mdi-alert-octagram</v-icon> Please note that your money will be reserved once power bank is returned. </p>
@@ -115,20 +115,15 @@
                                 <div>
 
                                     <div class="text-center">
-                                        <div class="col-md-6">
-                                            <!-- <v-text-field outlined v-model="mpesa_code" rounded placeholder="Mpesa Code. eg RFM12HQF" clearable type="text" label="Mpesa Code"></v-text-field> -->
-                                             <v-btn style="colo:#fff" class="text--white" color="green" @click="mpesaB2c()">
+                                        <div class="col-md-12">
+                                             <v-btn v-show="auth_state" style="colo:#fff" absolute :disabled="btn_disabled" class="text--white" color="green" @click="mpesaB2c()">
                                                 Request Refund, Ksh{{(deposit - amount).toFixed(0) }}
                                             </v-btn>
                                         </div>
-                                        <div class="col-md-12">
 
-                                        </div>
 
                                     </div>
-                                    <div>
 
-                                    </div>
 
                                 </div>
 
@@ -164,6 +159,7 @@ import {
 export default {
     data() {
         return {
+            btn_disabled:false,
             logo: require('@/assets/logo.PNG'),
             bg: require('@/assets/bg.png'),
             snackbar: false,
@@ -177,6 +173,7 @@ export default {
             value: 0,
             value: 0,
             progress_val: 0,
+            auth_state:false,
             minutes: 0,
             amount: 0,
             max_mins: 60,
@@ -241,6 +238,7 @@ export default {
     },
     methods: {
         mpesaB2c() {
+          this.btn_disabled = true;
             let that = this;
             if (this.refundable_number == null) {
                 that.snackbarText2 = "Provide mpesa code..";
@@ -250,8 +248,8 @@ export default {
                 axios
                     .post("https://chargenowmpesaapi-077f3b4b044f.herokuapp.com/b2c", {
                       Phonenumber: this.refundable_number,
-                      amount: this.refundable_amount,
-                      uid: this.refundable_amount,
+                      amount: (this.deposit - this.amount).toFixed(0),
+                      uid: this.$fire.auth.currentUser.uid ,
                     })
                     .then(function (response) {
                         console.log(response);
@@ -285,6 +283,7 @@ export default {
                         console.log(error);
                         that.snackbarText = error;
                         that.snackbar = true;
+                        that.btn_disabled = false;
 
                     })
                     .then(function () {
@@ -303,16 +302,23 @@ export default {
                     queryResult.forEach((doc) => {
                       this.timerEnabled = false;
                         this.refundable_number = doc.data().phone_no;
-                        this.getPhone(this.refundable_number);
+                        this.getPhone();
                         console.log("Members phone details", doc.data());
-
                     });
                 });
         },
-        getPhone(val){
-          if(val == null) {
-            this.logout();
-          }
+        getPhone(){
+          const db = this.$fire.firestore;
+                    db.collection("Charge24_users")
+                        .doc(this.$fire.auth.currentUser.uid)
+                        .delete()
+                        .then(() => {
+                          this.logout();
+                        })
+                        .catch((error) => {
+                            console.log("Error adding document: ", error);
+
+                        });
         },
       mpesaReversal() {
             let that = this;
@@ -485,18 +491,22 @@ export default {
             if (this.$fire.auth.currentUser != null) {
                 if (this.$fire.auth.currentUser.uid != null) {
 
+
                     console.log("User logged in", this.$fire.auth.currentUser.uid);
                     this.FetchUser(this.$fire.auth.currentUser.uid);
+                    this.auth_state = true;
 
 
                 } else {
                     console.log("User no logged in");
+                    this.auth_state = false;
 
                 }
             } else {
                 console.log("User no logged in");
-
-                window.location.reload(true);
+                this.$router.push({
+                        path: "/"
+                    });
                 //this.loginAnonymously1();
             }
         },
@@ -543,6 +553,6 @@ strong {
   background-size: contain;
 
   width: 100%;
-  height: 50vh;
+  height: 80vh;
 }
 </style>

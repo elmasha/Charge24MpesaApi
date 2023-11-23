@@ -1,10 +1,10 @@
 <template>
-  <v-app dark>
+  <v-app dark  style="background-color:black">
 
 
-    <v-main>
-      <v-container>
-        <Nuxt />
+    <v-main >
+      <v-container >
+        <Nuxt style="background-color:black"/>
       </v-container>
     </v-main>
 
@@ -44,5 +44,6 @@ export default {
 <style>
 * {
   font-family: "Lato";
+
 }
 </style>
