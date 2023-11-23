@@ -174,7 +174,7 @@ export default {
                 axios
                     .post("https://chargenowmpesaapi-077f3b4b044f.herokuapp.com/stk", {
                         Phonenumber: this.Phone,
-                        amount: "1",
+                        amount: "50",
                     })
                     .then(function (response) {
                         console.log(response);
@@ -303,6 +303,7 @@ export default {
                             start_time: start_time,
                             ref: ID,
                             active: true,
+                            phone_no:this.Phone,
                         })
                         .then((docRef) => {
                             console.log("User logged in");

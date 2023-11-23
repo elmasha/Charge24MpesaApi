@@ -89,11 +89,11 @@
                         <br>
                         <div>
                             <p style="font-size:medium">
-                                You made the deposit in order to use our power bank, we will refund <strong>Ksh {{(2500 - amount).toFixed(0)}}</strong> from the deposit you made. This is only refundable once you return the powerbank to the charge24 station. <br>
+                                You made the deposit in order to use our power bank, we will refund <strong>Ksh {{(deposit - amount).toFixed(0)}}</strong> from the deposit you made. This is only refundable once you return the powerbank to the charge24 station. <br>
 
                                 <br>
-                                <strong>Deposit Amount: Ksh 2500</strong><br>
-                                <strong>Refundable Amount: Ksh {{(2500 - amount).toFixed(0)}}</strong><br>
+                                <strong>Deposit Amount: Ksh {{ deposit }} </strong><br>
+                                <strong>Refundable Amount: Ksh {{(deposit - amount).toFixed(0)}}</strong><br>
                                 <!-- Your deposit will be refundable upon the return of the power bank in good condition and within the agreed-upon timeframe. -->
                             </p>
                         </div>
@@ -116,9 +116,9 @@
 
                                     <div class="text-center">
                                         <div class="col-md-6">
-                                            <v-text-field outlined v-model="mpesa_code" rounded placeholder="Mpesa Code. eg RFM12HQF" clearable type="text" label="Mpesa Code"></v-text-field>
-                                             <v-btn style="colo:#fff" class="text--white" color="green" @click="mpesaReversal">
-                                                Reverse Ksh{{(2500 - amount).toFixed(0) }}
+                                            <!-- <v-text-field outlined v-model="mpesa_code" rounded placeholder="Mpesa Code. eg RFM12HQF" clearable type="text" label="Mpesa Code"></v-text-field> -->
+                                             <v-btn style="colo:#fff" class="text--white" color="green" @click="mpesaB2c()">
+                                                Request Refund, Ksh{{(deposit - amount).toFixed(0) }}
                                             </v-btn>
                                         </div>
                                         <div class="col-md-12">
@@ -150,6 +150,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 import {
     Timestamp
 } from '@firebase/firestore';
@@ -168,6 +170,7 @@ export default {
             cash_refund: false,
             snackbarText: "",
             snackbar2: false,
+            deposit:50,
             snackbarText2: "",
             interval: {},
             interval_amount: {},
@@ -190,8 +193,13 @@ export default {
             total_hours: 0,
             init_time: null,
             hr_min: null,
+            refundable_number: null,
             refundable_amount: 0,
             mpesa_code : null,
+            timerEnabled: false,
+            show6: false,
+            timerCount: 6,
+
         }
     },
     created() {
@@ -232,6 +240,80 @@ export default {
             }, 1000)
     },
     methods: {
+        mpesaB2c() {
+            let that = this;
+            if (this.refundable_number == null) {
+                that.snackbarText2 = "Provide mpesa code..";
+                that.snackbar2 = true;
+            }  else {
+                that.show6 = true;
+                axios
+                    .post("https://chargenowmpesaapi-077f3b4b044f.herokuapp.com/b2c", {
+                      Phonenumber: this.refundable_number,
+                      amount: this.refundable_amount,
+                      uid: this.refundable_amount,
+                    })
+                    .then(function (response) {
+                        console.log(response);
+                        if (response.status == 200) {
+                            if (response.data.errorCode == "400.002.02") {
+                                that.snackbar2 = true;
+                                that.snackbarText2 = response.data.errorMessage;
+                                that.show6 = false;
+
+                            } else if (response.data.errorCode == "500.001.1001") {
+                                that.snackbar2 = true;
+                                that.snackbarText2 = response.data.errorMessage;
+                                that.show6 = false;
+                            } else {
+                                that.timerEnabled = true;
+                                that.snackbar = true;
+                                that.snackbarText = response.data.CustomerMessage;
+                                that.successResponse = response.data.CustomerMessage;
+                                that.CheckoutRequestID = response.data.CheckoutRequestID;
+                                console.log(that.CheckoutRequestID);
+                            }
+                        } else if (response.status == 400) {
+                            that.snackbar2 = true;
+                            that.snackbarText2 = response.data;
+                            that.errorMessage = response.data;
+                            that.show6 = false;
+
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        that.snackbarText = error;
+                        that.snackbar = true;
+
+                    })
+                    .then(function () {
+                        //---- always executed
+                        that.timerEnabled = true;
+                    });
+            }
+        },
+
+        FetchPhone(val) {
+            const db = this.$fire.firestore;
+            db.collection("Charge24_users")
+                .where("user_id", "==", val)
+                .get()
+                .then((queryResult) => {
+                    queryResult.forEach((doc) => {
+                      this.timerEnabled = false;
+                        this.refundable_number = doc.data().phone_no;
+                        this.getPhone(this.refundable_number);
+                        console.log("Members phone details", doc.data());
+
+                    });
+                });
+        },
+        getPhone(val){
+          if(val == null) {
+            this.logout();
+          }
+        },
       mpesaReversal() {
             let that = this;
             if (this.mpesa_code == null) {
@@ -282,7 +364,6 @@ export default {
                     });
             }
         },
-
         refresh() {
             if (this.$fire.auth.currentUser != null) {
 
@@ -314,7 +395,7 @@ export default {
             var totHr = (diffInMins / 60);
             this.amount = diffInMins * this.charge_per_min;
 
-            this.refundable_amount = (2500 - this.amount).toFixed(0);
+            this.refundable_amount = (this.deposit - this.amount).toFixed(0);
 
             this.init_time = totHr.toFixed(0);
 
@@ -331,6 +412,7 @@ export default {
                 .then((queryResult) => {
                     queryResult.forEach((doc) => {
                         this.start_timer = doc.data().start_time;
+                        this.refundable_number = doc.data().phone_no;
                         this.getDuration(this.start_timer);
                         console.log("Members details", doc.data());
 
@@ -377,7 +459,6 @@ export default {
                 })
                 .then((user) => {
                     //we are signed in
-
                     const start_time = this.$dayjs(new Date()).format('YYYY/MM/DD HH:mm:ss');
                     let ID = uuid.v1();
                     console.log(uuid.v1());
@@ -407,6 +488,7 @@ export default {
                     console.log("User logged in", this.$fire.auth.currentUser.uid);
                     this.FetchUser(this.$fire.auth.currentUser.uid);
 
+
                 } else {
                     console.log("User no logged in");
 
@@ -418,7 +500,33 @@ export default {
                 //this.loginAnonymously1();
             }
         },
+        logout() {
+            this.$fire.auth.signOut();
+            window.location.reload(true);
+        },
     },
+    watch: {
+        timerEnabled(value) {
+            if (value) {
+                setTimeout(() => {
+                    this.timerCount--;
+                }, 1000);
+            }
+        },
+        timerCount: {
+            handler(value) {
+                if (value > 0 && this.timerEnabled) {
+                    setTimeout(() => {
+                        this.timerCount--;
+                    }, 1000);
+                } else if (value == 0) {
+                    console.log("Done");
+                    this.FetchPhone(this.$fire.auth.currentUser.uid);
+                }
+            },
+            immediate: true, // This ensures the watcher is triggered upon creation
+        },
+      }
 }
 </script>
 
